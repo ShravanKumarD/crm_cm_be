@@ -32,8 +32,13 @@ db.sequelize = sequelize;
 
 db.Lead = require('./lead.model')(sequelize,Sequelize);
 db.User = require('./user.model')(sequelize,Sequelize);
+db.LeadAssignment = require('./LeadAssignment.model')(sequelize, Sequelize);
 
 db.User.hasMany(db.Lead, { foreignKey: 'userId' });
 db.Lead.belongsTo(db.User, { foreignKey: 'userId' });
+db.User.hasMany(db.LeadAssignment, { foreignKey: 'userId' });
+db.LeadAssignment.belongsTo(db.User, { foreignKey: 'userId' });
 
+db.Lead.hasMany(db.LeadAssignment, { foreignKey: 'leadId' });
+db.LeadAssignment.belongsTo(db.Lead, { foreignKey: 'leadId' });
 module.exports = db;

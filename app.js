@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 const db = require("./models");
 const leadRoutes = require('./routes/lead.routes');
 const userRoutes = require('./routes/user.routes');
+const leadAssignment = require('./routes/leadAssignment.routes');
+const { findSourceMap } = require("module");
 
 require("dotenv").config();
 
@@ -34,10 +36,13 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
-
+db.sequelize.sync({alter:true}).then(() => {
+  console.log("Database synchronized.");
+});
 // Routes
 app.use('/lead', leadRoutes);
 app.use('/user',userRoutes);
+app.use('/leadAssignment',leadAssignment)
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {

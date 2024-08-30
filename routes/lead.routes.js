@@ -11,7 +11,7 @@ router.delete('/:id', leadController.deleteLead);
 
 //bulk delete
 router.delete('/bulk-delete', leadController.deleteBulkLeads);
-//o/p should like this {
+//i/p should like this {
 //   "ids": [1, 2, 3, 4, 5]
 // }
 
