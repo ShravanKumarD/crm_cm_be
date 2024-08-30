@@ -77,6 +77,10 @@ module.exports = (sequelize, Sequelize) => {
             },
             allowNull: true,
           },
+          assignedTo:{
+            type: Sequelize.STRING,
+            allowNull: true,
+          }
       },
       {
         timestamps: false,

@@ -152,6 +152,73 @@ exports.updateLead = async (req, res) => {
   }
 };
 
+
+
+exports.updateLeadinBulk = async (req, res) => {
+  try {
+    const { id, action } = req.params; // For route parameters
+    // const { id, action } = req.query; // For query parameters
+
+    const updates = req.body;
+
+    if (id) {
+      // Single lead update
+      const [updated] = await Lead.update(updates, {
+        where: { id },
+        returning: true,
+      });
+
+      if (updated === 0) {
+        return res.status(404).json({
+          message: "Lead not found",
+        });
+      }
+
+      const updatedLead = await Lead.findByPk(id);
+
+      return res.status(200).json({
+        message: "Lead updated successfully",
+        lead: updatedLead,
+      });
+    } else {
+      // Bulk update
+      if (!Array.isArray(updates)) {
+        return res.status(400).json({
+          message: "Bulk update payload must be an array of objects",
+        });
+      }
+
+      const updatePromises = updates.map(async (update) => {
+        const [updated] = await Lead.update(update, {
+          where: { id: update.id },
+          returning: true,
+        });
+
+        if (updated === 0) {
+          return { id: update.id, status: "Lead not found" };
+        }
+
+        const updatedLead = await Lead.findByPk(update.id);
+        return { id: update.id, status: "Lead updated successfully", lead: updatedLead };
+      });
+
+      const results = await Promise.all(updatePromises);
+
+      return res.status(200).json({
+        message: "Bulk update completed",
+        results,
+      });
+    }
+
+  } catch (error) {
+    console.error("Error updating lead(s):", error);
+    res.status(500).json({
+      message: "Failed to update lead(s)",
+      error: error.message,
+    });
+  }
+};
+
 // Delete a lead
 exports.deleteLead = async (req, res) => {
   try {

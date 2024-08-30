@@ -45,9 +45,9 @@ app.use('/user',userRoutes);
 app.use('/leadAssignment',leadAssignment)
 
 // Catch 404 and forward to error handler
-app.use((req, res, next) => {
-  next(createError(404));
-});
+  app.use((req, res, next) => {
+    next(createError(404));
+  });
 
 // Error handler
 app.use((err, req, res, next) => {

@@ -35,11 +35,11 @@ module.exports = (sequelize, Sequelize) => {
 
             scheduledLeadDate: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: true
               },
               responseType: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: true
               },
               comment: {
                 type: Sequelize.STRING,
