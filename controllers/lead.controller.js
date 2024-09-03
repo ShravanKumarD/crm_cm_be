@@ -121,36 +121,36 @@ exports.getLeadById = async (req, res) => {
 };
 
 // Update a lead
-exports.updateLead = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
+// exports.updateLead = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updates = req.body;
 
-    const [updated] = await Lead.update(updates, {
-      where: { id },
-      returning: true,
-    });
+//     const [updated] = await Lead.update(updates, {
+//       where: { id },
+//       returning: true,
+//     });
 
-    if (updated === 0) {
-      return res.status(404).json({
-        message: "Lead not found",
-      });
-    }
+//     if (updated === 0) {
+//       return res.status(404).json({
+//         message: "Lead not found",
+//       });
+//     }
 
-    const updatedLead = await Lead.findByPk(id);
+//     const updatedLead = await Lead.findByPk(id);
 
-    res.status(200).json({
-      message: "Lead updated successfully",
-      lead: updatedLead,
-    });
-  } catch (error) {
-    console.error("Error updating lead:", error);
-    res.status(500).json({
-      message: "Failed to update lead",
-      error: error.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       message: "Lead updated successfully",
+//       lead: updatedLead,
+//     });
+//   } catch (error) {
+//     console.error("Error updating lead:", error);
+//     res.status(500).json({
+//       message: "Failed to update lead",
+//       error: error.message,
+//     });
+//   }
+// };
 
 
 
@@ -219,7 +219,42 @@ exports.updateLeadinBulk = async (req, res) => {
   }
 };
 
-// Delete a lead
+
+
+exports.updateMultipleLeads = async (req, res) => {
+  const { leadIds, status } = req.body;
+
+  try {
+      // Validate input
+      if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
+          return res.status(400).json({ error: 'Invalid or missing lead IDs.' });
+      }
+      if (!status) {
+          return res.status(400).json({ error: 'Status is required.' });
+      }
+
+      // Update the status for multiple leads
+      const [updatedCount] = await Lead.update(
+          { status },
+          {
+              where: {
+                id: leadIds
+              }
+          }
+      );
+
+      if (updatedCount === 0) {
+          return res.status(404).json({ message: 'No leads were updated. Please check the lead IDs.' });
+      }
+
+      return res.status(200).json({ message: 'Leads successfully updated.', updatedCount });
+  } catch (error) {
+      console.error('Error updating leads:', error);
+      return res.status(500).json({ error: 'Internal server error.', details: error.message });
+  }
+};
+
+
 exports.deleteLead = async (req, res) => {
   try {
     const { id } = req.params;
@@ -277,3 +312,5 @@ exports.deleteBulkLeads = async (req, res) => {
     });
   }
 };
+
+

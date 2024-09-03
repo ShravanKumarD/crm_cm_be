@@ -4,7 +4,7 @@ const User = db.User;
 // Create a new user
 exports.createUser = async (req, res) => {
     try {
-        const { employeeId, name, email, address, password, designation, otp, department, workingMode, role, status } = req.body;
+        const { employeeId, name, email,mobile, address, password, designation, otp, department, workingMode, role, status } = req.body;
 
         // Validate input
         if (!name || !email || !password) {
@@ -15,6 +15,7 @@ exports.createUser = async (req, res) => {
             employeeId,
             name,
             email,
+            mobile,
             address,
             password, 
             designation,
@@ -64,13 +65,14 @@ exports.getUserById = async (req, res) => {
 exports.updateUserById = async (req, res) => {
     try {
         const userId = req.params.id;
-        const { employeeId, name, email, address, password, designation, otp, department, workingMode, role, status } = req.body;
+        const { employeeId, name, email,mobile, address, password, designation, otp, department, workingMode, role, status } = req.body;
 
         const [updated] = await User.update({
             employeeId,
             name,
             email,
             address,
+            mobile,
             password, // Make sure to hash the password before saving in a real application
             designation,
             otp,

@@ -11,7 +11,8 @@ const db = require("./models");
 const leadRoutes = require('./routes/lead.routes');
 const userRoutes = require('./routes/user.routes');
 const leadAssignment = require('./routes/leadAssignment.routes');
-const { findSourceMap } = require("module");
+const loginRoutes = require('./routes/login.routes');
+const taskRoutes = require('./routes/task.routes');
 
 require("dotenv").config();
 
@@ -43,11 +44,13 @@ db.sequelize.sync({alter:true}).then(() => {
 app.use('/lead', leadRoutes);
 app.use('/user',userRoutes);
 app.use('/leadAssignment',leadAssignment)
+app.use('/auth',loginRoutes);
+app.use('/task',taskRoutes);
 
 // Catch 404 and forward to error handler
-  app.use((req, res, next) => {
-    next(createError(404));
-  });
+  // app.use((req, res, next) => {
+  //   next(createError(404));
+  // });
 
 // Error handler
 app.use((err, req, res, next) => {

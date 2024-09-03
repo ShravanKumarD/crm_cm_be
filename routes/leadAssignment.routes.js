@@ -2,13 +2,12 @@ const express = require('express');
 const router = express.Router();
 const leadController = require('../controllers/leadAssignment.controller');
 
-// Define route for assigning leads
+
 router.post('/assign', leadController.assignLeads);
-// router.get('/assigned/:id', leadController.getAssignedLeads);
 router.get('/asignedbyadmin/:id', leadController.leadAssignmentList);
 router.delete('/revertlead/:leadid',leadController.deleteAssignedLead);
-// Other lead-related routes can be added here
-// router.get('/', leadController.getLeads);
-// router.post('/', leadController.createLead);
+router.get('/user-leads/:id', leadController.getAssignedLeadsOfEmployee);
+router.put('/bulk-update-status', leadController.updateMultipleLeads);
+router.put('/update-lead', leadController.updateMultipleLeads);
 
 module.exports = router;

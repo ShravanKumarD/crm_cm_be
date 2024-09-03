@@ -127,3 +127,85 @@ exports.deleteAssignedLead = async (req, res) => {
         res.status(500).json({ message: 'Failed to delete lead assignment' });
     }
 };
+
+
+exports.getAssignedLeadsOfEmployee = (req, res) => {
+    const { id } = req.params;
+
+    LeadAssignment.findAll({
+        where: {
+            assignedToUserId: id
+        },
+        // include: [
+        //     {
+        //         model:Lead,
+        //         as: 'lead',
+        //         attributes: ['name']
+        //     }
+        // ]
+    })
+    .then((assignedLeads) => {
+        if (!assignedLeads.length) {
+            return res.status(200).json({ message: 'No leads assigned to this user.', leads: [] });
+        }
+
+        res.status(200).json({ leads: assignedLeads });
+    })
+    .catch(error => {
+        console.error('Error fetching assigned leads:', error);
+        return res.status(500).json({ message: 'Internal server error', error });
+    });
+};
+
+exports.updateMultipleLeads = async (req, res) => {
+    const { leadIds, status } = req.body;
+
+    try {
+        // Validate input
+        if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
+            return res.status(400).json({ error: 'Invalid or missing lead IDs.' });
+        }
+        if (!status) {
+            return res.status(400).json({ error: 'Status is required.' });
+        }
+
+        // Update the status for multiple leads
+        const [updatedCount] = await LeadAssignment.update(
+            { status },
+            {
+                where: {
+                  leadId: leadIds
+                }
+            }
+        );
+
+        if (updatedCount === 0) {
+            return res.status(404).json({ message: 'No leads were updated. Please check the lead IDs.' });
+        }
+
+        return res.status(200).json({ message: 'Leads successfully updated.', updatedCount });
+    } catch (error) {
+        console.error('Error updating leads:', error);
+        return res.status(500).json({ error: 'Internal server error.', details: error.message });
+    }
+};
+
+
+exports.update=async (req,res)=>{
+    const { status } = req.body;
+    const leadId = req.params.id;
+    try {
+        const updated = await LeadAssignment.update(
+            { status },
+            {
+                where: {
+                  leadId: leadId
+                }
+            }
+        );
+        return res.status(200).json({ message: 'Lead successfully updated.', updated });
+    } catch (error) {
+        console.error('Error updating leads:', error);
+        return res.status(500).json({ error: 'Internal server error.', details: error.message });
+    }
+}

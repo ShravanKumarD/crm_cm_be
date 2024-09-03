@@ -80,7 +80,7 @@ module.exports = (sequelize, Sequelize) => {
           assignedTo:{
             type: Sequelize.STRING,
             allowNull: true,
-          }
+          },
       },
       {
         timestamps: false,
