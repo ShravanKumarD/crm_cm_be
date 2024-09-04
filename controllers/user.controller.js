@@ -1,23 +1,30 @@
 const db = require('./../models/index'); 
 const User = db.User; 
+const bcrypt = require("bcrypt");
 
 // Create a new user
+
 exports.createUser = async (req, res) => {
     try {
-        const { employeeId, name, email,mobile, address, password, designation, otp, department, workingMode, role, status } = req.body;
+        const { employeeId, name, email, mobile, address, password, designation, otp, department, workingMode, role, status } = req.body;
 
         // Validate input
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Name, email, and password are required.' });
         }
 
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Create the new user
         const newUser = await User.create({
             employeeId,
             name,
             email,
             mobile,
             address,
-            password, 
+            password: hashedPassword, // Use the hashed password
             designation,
             otp,
             department,
@@ -32,7 +39,6 @@ exports.createUser = async (req, res) => {
         res.status(500).json({ message: 'Error creating user.', error });
     }
 };
-
 // Get all users
 exports.getAllUsers = async (req, res) => {
     try {
@@ -49,7 +55,7 @@ exports.getUserById = async (req, res) => {
     try {
         const userId = req.params.id;
         const user = await User.findByPk(userId);
-
+console.log(user)
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
@@ -66,6 +72,7 @@ exports.updateUserById = async (req, res) => {
     try {
         const userId = req.params.id;
         const { employeeId, name, email,mobile, address, password, designation, otp, department, workingMode, role, status } = req.body;
+        console.log(req.body,"jjj")
 
         const [updated] = await User.update({
             employeeId,
@@ -73,7 +80,7 @@ exports.updateUserById = async (req, res) => {
             email,
             address,
             mobile,
-            password, // Make sure to hash the password before saving in a real application
+            password, 
             designation,
             otp,
             department,
@@ -85,7 +92,7 @@ exports.updateUserById = async (req, res) => {
         });
 
         if (!updated) {
-            return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'no field modified' });
         }
 
         const updatedUser = await User.findByPk(userId);
