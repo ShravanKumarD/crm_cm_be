@@ -31,7 +31,6 @@ let followUpDate=new Date(followUp).toString()
 
 
   exports.getAllTasks = async (req, res) => {
-    console.log('get all tasks')
     try {
       const tasks = await Task.findAll({
         include: [
