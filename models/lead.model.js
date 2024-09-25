@@ -12,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
           type: Sequelize.STRING,
           allowNull: true,
         },
+        dateImported:{
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
         name: {
           type: Sequelize.STRING,
           allowNull: true,

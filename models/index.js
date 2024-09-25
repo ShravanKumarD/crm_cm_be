@@ -1,6 +1,5 @@
 const dbConfig = require("./../configs/db.config");
 const Sequelize = require("sequelize");
-console.log(dbConfig)
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
@@ -35,6 +34,8 @@ db.Lead = require("./lead.model")(sequelize, Sequelize);
 db.User = require("./user.model")(sequelize, Sequelize);
 db.LeadAssignment = require("./LeadAssignment.model")(sequelize, Sequelize);
 db.Task = require("./task.model")(sequelize, Sequelize);
+db.loansReport = require("./loansReport.modal")(sequelize,Sequelize);
+db.creditReport=require("./creditReport.modal")(sequelize,Sequelize);
 
 // Define associations
 db.User.hasMany(db.Lead, { foreignKey: "userId" });
@@ -56,6 +57,23 @@ db.User.hasMany(db.Task, {
 db.Lead.hasMany(db.Task, {
   foreignKey: "leadId",
   as: "tasks",
+});
+db.Lead.hasMany(db.loansReport, {
+  foreignKey: "leadId",
+  as: "loansReport",
+});
+db.loansReport.belongsTo(db.Lead, {
+  foreignKey: "leadId",
+  as: "lead",
+});
+db.Lead.hasMany(db.creditReport, {
+  foreignKey: "leadId",
+  as: "creditReports", 
+});
+
+db.creditReport.belongsTo(db.Lead, {
+  foreignKey: "leadId",
+  as: "lead",
 });
 db.Task.belongsTo(db.Lead, {
   foreignKey: "leadId",

@@ -4,30 +4,48 @@ const { Task, User, Lead }=db
 
 exports.createTask = async (req, res) => {
   try {
-    let { title, description, status, userId, leadId,createdDate,updatedDate,actionType,followUp } = req.body;
-if(!createdDate){
-  createdDate = new Date().toString();
-}else{
-  createdDate = new Date(createdDate).toString();
-}
-let followUpDate=new Date(followUp).toString()
+    const { description, status, userId, leadId,company,city,email,createdDate, updatedDate,docsCollected, actionType, followUp } = req.body;
+
+    // Handle dates
+    const createdDateString = createdDate ? new Date(createdDate).toString() : new Date().toString();
+    const followUpDate = followUp ? new Date(followUp).toString() : null;
+
     // Validate if user exists
     const user = await User.findByPk(userId);
     if (userId && !user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    // Validate if lead exists
     const lead = await Lead.findByPk(leadId);
     if (!lead) {
       return res.status(404).json({ message: 'Lead not found' });
     }
-
-    const task = await Task.create({ title, description, status,actionType, userId, leadId,createdDate,updatedDate,followUpDate });
-    res.status(201).json(task);
+    const task = await Task.create({ 
+      description, 
+      status, 
+      actionType,
+      docsCollected:docsCollected, 
+      userId, 
+      leadId, 
+      createdDate: createdDateString,
+      updatedDate, 
+      followUp: followUpDate
+    });
+    const [updated] = await Lead.update({ 
+      status:status,
+      company:company,
+      city:city,
+      email:email
+      
+    }, {
+      where: { id: leadId } 
+    });
+    res.status(201).json({ task, lead: updated });
   } catch (error) {
+    console.error('Error creating task:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
   exports.getAllTasks = async (req, res) => {
@@ -44,35 +62,44 @@ let followUpDate=new Date(followUp).toString()
     }
   };
 
-  exports.getTaskById = async (req, res) => {
+  exports.getTasksByUserId = async (req, res) => {
     try {
-      const task = await Task.findByPk(req.params.id, {
-        include: [
-          { model: User, as: 'user', attributes: ['name'] },
-          { model: Lead, as: 'lead', attributes: ['title'] }
-        ]
-      });
+      // const userId = req.params.userId;
+        const { id } = req.params;
+       let user =await User.findByPk(id);
       
-      if (!task) {
-        return res.status(404).json({ message: 'Task not found' });
-      }
-  
-      res.status(200).json(task);
+        if (!user.id) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+
+        // Fetch tasks associated with the specified userId
+        let uId = user.id
+        const tasks = await Task.findAll({
+            where: {  
+              userId:uId},
+            include: [
+                { model: User, as: 'user', attributes: ['id', 'name'] },
+                { model: Lead, as: 'lead', attributes: ['id', 'name'] }  
+            ]
+        });
+
+        if (!tasks.length) {
+            return res.status(404).json({ message: 'No tasks found for this user' });
+        }
+
+        res.status(200).json(tasks);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
-  };
-  
-  exports.updateTask = async (req, res) => {
+};
+
+  exports.updateTask = async (req, res) => {//update  by userid
     try {
-      let { title, description, status, userId, leadId,createdDate,updatedDate,actionType,followUp} = req.body;
-      if(!updatedDate){
-        updatedDate = new Date().toString();
-      }else{
-        updatedDate = new Date(updatedDate).toString();
-      }
-  let followUpDate=new Date(followUp).toString()
-      // Validate if user exists
+      const { description, status,city,email, company,userId, leadId, createdDate,docsCollected, updatedDate, actionType, followUp,taskStatus } = req.body;
+  
+      const updatedDateString = updatedDate ? new Date(updatedDate).toString() : new Date().toString();
+      const followUpDate = followUp ? new Date(followUp).toString() : null;
+
       if (userId) {
         const user = await User.findByPk(userId);
         if (!user) {
@@ -80,7 +107,6 @@ let followUpDate=new Date(followUp).toString()
         }
       }
   
-      // Validate if lead exists
       if (leadId) {
         const lead = await Lead.findByPk(leadId);
         if (!lead) {
@@ -88,25 +114,41 @@ let followUpDate=new Date(followUp).toString()
         }
       }
   
-      const [updated] = await Task.update({ title, description, status, actionType,followUpDate,userId, leadId,updatedDate,createdDate }, {
-        where: { id: req.params.id }
-      });
+      const [updated] = await Task.update(
+        { description, status, actionType, followUpDate,docsCollected:docsCollected, userId, leadId, updatedDate: updatedDateString, createdDate },
+        { where: { id: req.params.id } }
+      );
   
+      // Check if task was updated
       if (updated) {
+        const [updatedLead] = await Lead.update(
+          { status:status,
+            company:company,
+            city:city,
+            email:email,
+            taskStatus:taskStatus
+           }, 
+          { where: { id: leadId } }
+        );
+  
+        // Fetch the updated task with related models
         const updatedTask = await Task.findByPk(req.params.id, {
           include: [
-            { model: User, as: 'user', attributes: ['name'] },
-            { model: Lead, as: 'lead', attributes: ['name'] }
+            { model: User, as: 'user', attributes: ['id'] },
+            { model: Lead, as: 'lead', attributes: ['id'] }
           ]
         });
-        res.status(200).json(updatedTask);
+  
+        res.status(200).json({ task: updatedTask, lead: updatedLead });
       } else {
         res.status(404).json({ message: 'Task not found' });
       }
     } catch (error) {
+      console.error('Error updating task:', error);
       res.status(500).json({ error: error.message });
     }
   };
+  
 
   exports.deleteTask = async (req, res) => {
     try {

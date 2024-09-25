@@ -3,7 +3,6 @@ const { User, Lead, LeadAssignment } = db;
 
 exports.assignLeads = async (req, res) => {
     const { leadIds, assignedBy, assignedDate, assignedToUserId } = req.body;
-
     try {
         // Check if the user exists
         const user = await User.findByPk(assignedToUserId);
@@ -27,7 +26,6 @@ exports.assignLeads = async (req, res) => {
         if (leads.length !== leadIds.length) {
             return res.status(404).json({ error: 'Some leads not found.' });
         }
-console.log(adminOrManager.id,"adminOrManager")
         // Prepare assignments with the provided or current date
         const assignments = leadIds.map(leadId => ({
             leadId,
@@ -192,7 +190,16 @@ exports.updateMultipleLeads = async (req, res) => {
 
 
 exports.update=async (req,res)=>{
-    const { status } = req.body;
+    console.log(req,'in')
+    const {  
+        name,
+        email,
+        gender,
+        dob,
+        company,
+        city,
+        tags,
+        status, } = req.body;
     const leadId = req.params.id;
     try {
         const updated = await LeadAssignment.update(
@@ -203,9 +210,32 @@ exports.update=async (req,res)=>{
                 }
             }
         );
-        return res.status(200).json({ message: 'Lead successfully updated.', updated });
+        const [leadUpdate] = await Lead.update({
+            name,
+            email,
+            gender,
+            dob,
+            company,
+            city,
+            tags,
+            status,
+        },
+        {
+            where: {
+              id: leadId
+            }
+        })
+        return res.status(200).json({ message: 'Lead successfully updated.', updated,lead:leadUpdate });
     } catch (error) {
         console.error('Error updating leads:', error);
         return res.status(500).json({ error: 'Internal server error.', details: error.message });
     }
 }
+
+exports.getAllAssignedLeads=async(req,res)=>{
+try{
+    const LeadAssignment = await LeadAssignment.findAll()
+}catch(error){
+    console.error('Error fetching leads:', error);
+}
+}   

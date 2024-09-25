@@ -24,7 +24,7 @@ exports.createUser = async (req, res) => {
             email,
             mobile,
             address,
-            password: hashedPassword, // Use the hashed password
+            password: hashedPassword,
             designation,
             otp,
             department,
@@ -55,7 +55,6 @@ exports.getUserById = async (req, res) => {
     try {
         const userId = req.params.id;
         const user = await User.findByPk(userId);
-console.log(user)
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
@@ -72,15 +71,15 @@ exports.updateUserById = async (req, res) => {
     try {
         const userId = req.params.id;
         const { employeeId, name, email,mobile, address, password, designation, otp, department, workingMode, role, status } = req.body;
-        console.log(req.body,"jjj")
-
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
         const [updated] = await User.update({
             employeeId,
             name,
             email,
             address,
             mobile,
-            password, 
+            password:hashedPassword, 
             designation,
             otp,
             department,

@@ -6,10 +6,10 @@ router.post('/', leadController.createLead);
 router.post('/bulk',leadController.createBulkLeads);
 router.get('/', leadController.getAllLeads);
 router.get('/:id', leadController.getLeadById);
-// router.put('/:id', leadController.updateLead);
+router.put('/:id',leadController.updateLead);
 router.put('/:id/:action', leadController.updateLeadinBulk);
 router.delete('/:id', leadController.deleteLead);
-router.put('/update-leads',leadController.updateMultipleLeads)
+// router.put('/updateLeads',leadController.updateMultipleLeads);
 //bulk delete
 router.delete('/bulk-delete', leadController.deleteBulkLeads);
 //i/p should like this {

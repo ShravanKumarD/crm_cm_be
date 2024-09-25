@@ -5,10 +5,10 @@ module.exports = (sequelize, Sequelize) => {
     const task = sequelize.define(
         "task",
         {
-            title:{
-                    type: Sequelize.STRING,
-                    allowNull: true
-            },
+            // title:{
+            //         type: Sequelize.STRING,
+            //         allowNull: true
+            // },   
             description:{
                 type: Sequelize.STRING,
                 allowNull: true
@@ -24,6 +24,15 @@ module.exports = (sequelize, Sequelize) => {
             followUp:{
                 type: Sequelize.STRING,
                 allowNull: true
+            },
+            docsCollected: {
+                // type: Sequelize.ENUM('Yes', 'No'),
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            taskStatus:{
+                type: Sequelize.STRING,
+                allowNull: true  
             },
             userId: {
                 type: Sequelize.INTEGER,

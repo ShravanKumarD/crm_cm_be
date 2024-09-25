@@ -13,6 +13,8 @@ const userRoutes = require('./routes/user.routes');
 const leadAssignment = require('./routes/leadAssignment.routes');
 const loginRoutes = require('./routes/login.routes');
 const taskRoutes = require('./routes/task.routes');
+const loansReportRoutes = require("./routes/loansReport.routes");
+const creditReportRoutes = require("./routes/creditReport.routes");
 
 require("dotenv").config();
 
@@ -46,6 +48,8 @@ app.use('/user',userRoutes);
 app.use('/leadAssignment',leadAssignment)
 app.use('/auth',loginRoutes);
 app.use('/task',taskRoutes);
+app.use("/loans-reports", loansReportRoutes);
+app.use("/credit-reports", creditReportRoutes);
 
 // Catch 404 and forward to error handler
   // app.use((req, res, next) => {

@@ -11,6 +11,7 @@ exports.createLead = async (req, res, next) => {
       phone,
       email,
       leadSource,
+      dateImported,
       leadOwner,
       gender,
       dob,
@@ -23,6 +24,7 @@ exports.createLead = async (req, res, next) => {
     const newLead = await Lead.create({
       name,
       assignedDate,
+      dateImported,
       phone,
       email,
       leadSource,
@@ -50,9 +52,6 @@ exports.createLead = async (req, res, next) => {
 
 
 exports.createBulkLeads = async (req, res) => {
-  console.log('Inside createBulkLeads controller');
-  console.log(req.body, "body");
-
   try {
     // Validate that req.body is an array of leads
     if (!Array.isArray(req.body) || req.body.length === 0) {
@@ -121,36 +120,36 @@ exports.getLeadById = async (req, res) => {
 };
 
 // Update a lead
-// exports.updateLead = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const updates = req.body;
+exports.updateLead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
 
-//     const [updated] = await Lead.update(updates, {
-//       where: { id },
-//       returning: true,
-//     });
+    const [updated] = await Lead.update(updates, {
+      where: { id },
+      returning: true,
+    });
 
-//     if (updated === 0) {
-//       return res.status(404).json({
-//         message: "Lead not found",
-//       });
-//     }
+    if (updated === 0) {
+      return res.status(404).json({
+        message: "Lead not found",
+      });
+    }
 
-//     const updatedLead = await Lead.findByPk(id);
+    const updatedLead = await Lead.findByPk(id);
 
-//     res.status(200).json({
-//       message: "Lead updated successfully",
-//       lead: updatedLead,
-//     });
-//   } catch (error) {
-//     console.error("Error updating lead:", error);
-//     res.status(500).json({
-//       message: "Failed to update lead",
-//       error: error.message,
-//     });
-//   }
-// };
+    res.status(200).json({
+      message: "Lead updated successfully",
+      lead: updatedLead,
+    });
+  } catch (error) {
+    console.error('in updatelead', error);
+    res.status(500).json({
+      message: "Failed to update lead",
+      error: error.message,
+    });
+  }
+};
 
 
 
@@ -211,7 +210,7 @@ exports.updateLeadinBulk = async (req, res) => {
     }
 
   } catch (error) {
-    console.error("Error updating lead(s):", error);
+    console.error("Error updating lead(s) in bulk:", error);
     res.status(500).json({
       message: "Failed to update lead(s)",
       error: error.message,
@@ -221,38 +220,47 @@ exports.updateLeadinBulk = async (req, res) => {
 
 
 
-exports.updateMultipleLeads = async (req, res) => {
-  const { leadIds, status } = req.body;
+// exports.updateMultipleLeads = async (req, res) => {
+//   const { leadIds, status } = req.body;
+//   const assignedTo = Number(req.body.assignedTo);
+//   const normalizedLeadIds = Array.isArray(leadIds) ? leadIds : [leadIds];
+//   console.log(assignedTo,isNaN(assignedTo));
+//   console.log(normalizedLeadIds,"normalizedLeadIds")
+//   try { 
 
-  try {
-      // Validate input
-      if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
-          return res.status(400).json({ error: 'Invalid or missing lead IDs.' });
-      }
-      if (!status) {
-          return res.status(400).json({ error: 'Status is required.' });
-      }
+//     if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
+//       console.log(!leadIds || !Array.isArray(leadIds) || leadIds.length === 0,'1')
+//       return res.status(400).json({ error: 'Invalid or missing lead IDs.' });
+//   }
+//   if (!assignedTo || !Number.isInteger(assignedTo)) {
+//       return res.status(400).json({ error: 'Assigned user ID must be a valid integer.' });
+//   }
+//   console.log("Normalized Lead IDs:", normalizedLeadIds); // Log the normalized lead IDs
 
-      // Update the status for multiple leads
-      const [updatedCount] = await Lead.update(
-          { status },
-          {
-              where: {
-                id: leadIds
-              }
-          }
-      );
+//   const [updatedCount] = await Lead.update(
+//     { assigned_to: assignedTo },
+//     {
+//       where: {
+//         id: 1
+//       },
+//     }
+//   );
+  
+//   console.log("Updated Count:", updatedCount); 
+  
+//   if (updatedCount === 0) {
+//     console.log("No leads found with the provided IDs."); // More detailed logging
+//     return res.status(404).json({ message: 'No leads were updated. Please check the lead IDs.' });
+//   }
+  
 
-      if (updatedCount === 0) {
-          return res.status(404).json({ message: 'No leads were updated. Please check the lead IDs.' });
-      }
+//     return res.status(200).json({ message: 'Leads successfully updated.', updatedCount });
+//   } catch (error) {
+//     console.error('Error updating leads:', error);
+//     return res.status(500).json({ error: 'Internal server error.', details: error.message });
+//   }
+// };
 
-      return res.status(200).json({ message: 'Leads successfully updated.', updatedCount });
-  } catch (error) {
-      console.error('Error updating leads:', error);
-      return res.status(500).json({ error: 'Internal server error.', details: error.message });
-  }
-};
 
 
 exports.deleteLead = async (req, res) => {

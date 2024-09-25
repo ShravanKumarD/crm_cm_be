@@ -9,5 +9,6 @@ router.delete('/revertlead/:leadid',leadController.deleteAssignedLead);
 router.get('/user-leads/:id', leadController.getAssignedLeadsOfEmployee);
 router.put('/bulk-update-status', leadController.updateMultipleLeads);
 router.put('/update-lead', leadController.updateMultipleLeads);
+router.put('/:id',leadController.update);
 
 module.exports = router;
