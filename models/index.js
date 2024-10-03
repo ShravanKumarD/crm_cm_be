@@ -1,9 +1,9 @@
 const dbConfig = require("./../configs/db.config");
 const Sequelize = require("sequelize");
 console.log(dbConfig)
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, ' ', {
-  host: dbConfig.HOST,
-  dialect: dbConfig.dialect,
+const sequelize = new Sequelize('Creditmitra', 'root', ' ', {
+  host: 'localhost',
+  dialect: 'mysql',
   // operatorsAliases: false, // Set to false for best practice
   timezone: "+05:30", // Set the timezone for your region
   logging: false, // Disable logging for production
