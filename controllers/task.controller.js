@@ -3,14 +3,28 @@ const db = require('./../models/index');
 const { Task, User, Lead }=db
 
 exports.createTask = async (req, res) => {
+  console.log("hellooooooo");
+  console.log(req.body, "body");
+
   try {
-    const { description, status, userId, leadId,company,city,email,createdDate, updatedDate,docsCollected, actionType, followUp } = req.body;
+    const { 
+      description, 
+      status, 
+      userId, 
+      leadId,
+      company,    
+      city, 
+      email, 
+      createdDate, 
+      updatedDate, 
+      docsCollected, 
+      actionType, 
+      followUp 
+    } = req.body;
 
-    // Handle dates
-    const createdDateString = createdDate ? new Date(createdDate).toString() : new Date().toString();
-    const followUpDate = followUp ? new Date(followUp).toString() : null;
 
-    // Validate if user exists
+    const createdDateString = createdDate ? new Date(createdDate).toISOString() : new Date().toISOString();
+    const followUpDate = followUp ? new Date(followUp).toISOString() : null;
     const user = await User.findByPk(userId);
     if (userId && !user) {
       return res.status(404).json({ message: 'User not found' });
@@ -19,32 +33,50 @@ exports.createTask = async (req, res) => {
     if (!lead) {
       return res.status(404).json({ message: 'Lead not found' });
     }
+
+    // Create task
     const task = await Task.create({ 
       description, 
       status, 
       actionType,
-      docsCollected:docsCollected, 
+      docsCollected, 
       userId, 
       leadId, 
       createdDate: createdDateString,
       updatedDate, 
-      followUp: followUpDate
+      followUp: followUpDate // Reference the correctly defined variable
     });
+
+    console.log(followUpDate, 'followUpDate');
+    
+    // Update lead with the provided details
     const [updated] = await Lead.update({ 
-      status:status,
-      company:company,
-      city:city,
-      email:email
-      
+      status: status,
+      company: company,
+      city: city,
+      email: email,
+      followUp: followUpDate
     }, {
-      where: { id: leadId } 
+      where: { id: leadId },
+      returning: true, // Added this to return the updated lead
     });
-    res.status(201).json({ task, lead: updated });
+console.log(updated,"dfr")
+    if (updated === 0) {
+      console.log("Lead not updated");
+      return res.status(400).json({ message: 'Lead update failed or no changes detected.' });
+    }
+
+    const updatedLead = await Lead.findByPk(leadId); // Fetch the updated lead data
+
+    console.log(updated, "Lead successfully updated");
+
+    res.status(201).json({ task, lead: updatedLead }); // Return the updated lead
   } catch (error) {
     console.error('Error creating task:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
@@ -99,7 +131,7 @@ exports.createTask = async (req, res) => {
   
       const updatedDateString = updatedDate ? new Date(updatedDate).toString() : new Date().toString();
       const followUpDate = followUp ? new Date(followUp).toString() : null;
-
+   console.log(taskStatus,leadId,userId,"sejbfwehbferfg")
       if (userId) {
         const user = await User.findByPk(userId);
         if (!user) {
@@ -115,10 +147,12 @@ exports.createTask = async (req, res) => {
       }
   
       const [updated] = await Task.update(
-        { description, status, actionType, followUpDate,docsCollected:docsCollected, userId, leadId, updatedDate: updatedDateString, createdDate },
+        { description, status, actionType,
+          taskStatus:taskStatus
+          , followUpDate,docsCollected:docsCollected, userId, leadId, updatedDate: updatedDateString, createdDate },
         { where: { id: req.params.id } }
       );
-  
+      console.log(updated,"updated")
       // Check if task was updated
       if (updated) {
         const [updatedLead] = await Lead.update(
@@ -126,12 +160,10 @@ exports.createTask = async (req, res) => {
             company:company,
             city:city,
             email:email,
-            taskStatus:taskStatus
            }, 
           { where: { id: leadId } }
         );
-  
-        // Fetch the updated task with related models
+
         const updatedTask = await Task.findByPk(req.params.id, {
           include: [
             { model: User, as: 'user', attributes: ['id'] },

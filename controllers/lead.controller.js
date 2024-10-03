@@ -82,7 +82,15 @@ exports.createBulkLeads = async (req, res) => {
 // Get all leads
 exports.getAllLeads = async (req, res) => {
   try {
-    const leads = await Lead.findAll();
+    const leads = await Lead.findAll({
+      include: [
+        {
+          model: db.Task,
+          as: 'tasks',
+          attributes: ['id', 'status', 'description', 'actionType', 'followUp', 'taskStatus'],
+        },
+      ],
+    });
     res.status(200).json({
       leads,
     });
@@ -121,6 +129,7 @@ exports.getLeadById = async (req, res) => {
 
 // Update a lead
 exports.updateLead = async (req, res) => {
+  console.log('on lead')
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -143,7 +152,7 @@ exports.updateLead = async (req, res) => {
       lead: updatedLead,
     });
   } catch (error) {
-    console.error('in updatelead', error);
+    // console.error('in updatelead', error);
     res.status(500).json({
       message: "Failed to update lead",
       error: error.message,

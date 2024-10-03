@@ -73,6 +73,10 @@ module.exports = (sequelize, Sequelize) => {
           type: Sequelize.STRING,
           allowNull: true,
         },
+        followUp:{
+          type: Sequelize.STRING,
+          allowNull: true
+      },
         userId: { 
             type: Sequelize.INTEGER,
             references: {

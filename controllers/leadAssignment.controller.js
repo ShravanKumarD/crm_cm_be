@@ -190,35 +190,21 @@ exports.updateMultipleLeads = async (req, res) => {
 
 
 exports.update=async (req,res)=>{
-    console.log(req,'in')
+  
     const {  
-        name,
-        email,
-        gender,
-        dob,
-        company,
-        city,
-        tags,
         status, } = req.body;
     const leadId = req.params.id;
     try {
         const updated = await LeadAssignment.update(
-            { status },
+            { status:status },
             {
                 where: {
-                  leadId: leadId
+                    leadId: leadId
                 }
             }
         );
         const [leadUpdate] = await Lead.update({
-            name,
-            email,
-            gender,
-            dob,
-            company,
-            city,
-            tags,
-            status,
+            status:status,
         },
         {
             where: {
