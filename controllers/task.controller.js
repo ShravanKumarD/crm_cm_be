@@ -3,9 +3,6 @@ const db = require('./../models/index');
 const { Task, User, Lead }=db
 
 exports.createTask = async (req, res) => {
-  console.log("hellooooooo");
-  console.log(req.body, "body");
-
   try {
     const { 
       description, 
@@ -33,44 +30,19 @@ exports.createTask = async (req, res) => {
     if (!lead) {
       return res.status(404).json({ message: 'Lead not found' });
     }
-
-    // Create task
     const task = await Task.create({ 
-      description, 
-      status, 
-      actionType,
-      docsCollected, 
-      userId, 
-      leadId, 
+      description:description, 
+      status:status, 
+      actionType:actionType,
+      docsCollected:docsCollected, 
+      userId :userId, 
+      leadId:leadId, 
       createdDate: createdDateString,
-      updatedDate, 
-      followUp: followUpDate // Reference the correctly defined variable
-    });
-
-    console.log(followUpDate, 'followUpDate');
-    
-    // Update lead with the provided details
-    const [updated] = await Lead.update({ 
-      status: status,
-      company: company,
-      city: city,
-      email: email,
+      updatedDate:updatedDate, 
       followUp: followUpDate
-    }, {
-      where: { id: leadId },
-      returning: true, // Added this to return the updated lead
     });
-console.log(updated,"dfr")
-    if (updated === 0) {
-      console.log("Lead not updated");
-      return res.status(400).json({ message: 'Lead update failed or no changes detected.' });
-    }
-
-    const updatedLead = await Lead.findByPk(leadId); // Fetch the updated lead data
-
-    console.log(updated, "Lead successfully updated");
-
-    res.status(201).json({ task, lead: updatedLead }); // Return the updated lead
+    console.log(task,"task")
+    res.status(201).json({ task });
   } catch (error) {
     console.error('Error creating task:', error);
     res.status(500).json({ error: error.message });
