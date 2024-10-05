@@ -4,7 +4,6 @@ const { User, Lead, LeadAssignment } = db;
 exports.assignLeads = async (req, res) => {
     const { leadIds, assignedBy, assignedDate, assignedToUserId } = req.body;
     try {
-        // Check if the user exists
         const user = await User.findByPk(assignedToUserId);
         const adminOrManager = await User.findByPk(assignedBy);
         
@@ -14,27 +13,20 @@ exports.assignLeads = async (req, res) => {
         if (!adminOrManager || adminOrManager.role !== 'ROLE_ADMIN') {
             return res.status(403).json({ error: 'Only admins or managers can assign leads.' });
         }
-
-        // Find all leads by provided IDs
         const leads = await Lead.findAll({
             where: {
                 id: leadIds
             }
         });
-
-        // Check if all leads were found
         if (leads.length !== leadIds.length) {
             return res.status(404).json({ error: 'Some leads not found.' });
         }
-        // Prepare assignments with the provided or current date
         const assignments = leadIds.map(leadId => ({
             leadId,
             assignedToUserId: user.id,
             assignedByUserId:adminOrManager.id, 
             assignedDate: assignedDate ? new Date(assignedDate) : new Date()
         }));
-
-        // Bulk create or update assignments
         await LeadAssignment.bulkCreate(assignments, {
             updateOnDuplicate: ['userId', 'assignedBy', 'assignedDate'],
         });
@@ -45,9 +37,6 @@ exports.assignLeads = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error.', details: error.message });
     }
 };
-
-
-
 //user
 exports.getAssignedLeads = async (req, res) => {
     const { userId } = req.params;
@@ -216,12 +205,14 @@ exports.update=async (req,res)=>{
         console.error('Error updating leads:', error);
         return res.status(500).json({ error: 'Internal server error.', details: error.message });
     }
-}
-
-exports.getAllAssignedLeads=async(req,res)=>{
-try{
-    const LeadAssignment = await LeadAssignment.findAll()
-}catch(error){
-    console.error('Error fetching leads:', error);
-}
 }   
+exports.getallEmpAssignedLeads = async (req, res) => {
+    try {
+      const leads = await LeadAssignment.findAll();
+      res.status(200).json(leads);
+    } catch (error) {
+      console.error("Error fetching assigned leads:", error.message);
+      res.status(500).json({ message: "Failed to fetch assigned leads.", error: error.message });
+    }
+  };
+  

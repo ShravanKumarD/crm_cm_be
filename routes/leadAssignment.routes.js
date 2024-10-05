@@ -10,5 +10,6 @@ router.get('/user-leads/:id', leadController.getAssignedLeadsOfEmployee);
 router.put('/bulk-update-status', leadController.updateMultipleLeads);
 router.put('/update-lead', leadController.updateMultipleLeads);
 router.put('/:id',leadController.update);
+router.get('/all-assigned',leadController.getallEmpAssignedLeads)
 
 module.exports = router;
