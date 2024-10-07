@@ -3,7 +3,7 @@ const Lead = db.Lead;
 
 // Create a new lead
 exports.createLead = async (req, res, next) => {
-
+console.log(req.body,"reqqq")
   try {
     const {
         assignedDate,
@@ -52,16 +52,24 @@ exports.createLead = async (req, res, next) => {
 
 
 exports.createBulkLeads = async (req, res) => {
+  console.log(req.body, "Received leads data");
+
   try {
-    // Validate that req.body is an array of leads
     if (!Array.isArray(req.body) || req.body.length === 0) {
       return res.status(400).json({
         message: "Invalid input. Please provide an array of leads.",
       });
     }
-
-    // Create leads in bulk
-    const leads = await Lead.bulkCreate(req.body, {
+    const validLeads = req.body.filter(lead => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return lead.email && emailRegex.test(lead.email);
+    });
+    if (validLeads.length === 0) {
+      return res.status(400).json({
+        message: "No valid leads to create. Please check the email formats.",
+      });
+    }
+    const leads = await Lead.bulkCreate(validLeads, {
       validate: true,
     });
 
@@ -71,6 +79,13 @@ exports.createBulkLeads = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating leads:", error);
+    if (error.errors) {
+      return res.status(400).json({
+        message: "Validation errors occurred",
+        errors: error.errors.map(e => e.message),
+      });
+    }
+
     res.status(500).json({
       message: "Failed to create leads",
       error: error.message,

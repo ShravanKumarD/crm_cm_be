@@ -97,9 +97,10 @@ exports.createTask = async (req, res) => {
     }
 };
 
-  exports.updateTask = async (req, res) => {//update  by userid
+  exports.  updateTask = async (req, res) => {//update  by userid
     try {
       const { description, status,city,email, company,userId, leadId, createdDate,docsCollected, updatedDate, actionType, followUp,taskStatus } = req.body;
+      console.log(req.body,req.params.id,"req.body")
   
       const updatedDateString = updatedDate ? new Date(updatedDate).toString() : new Date().toString();
       const followUpDate = followUp ? new Date(followUp).toString() : null;
@@ -125,28 +126,27 @@ exports.createTask = async (req, res) => {
         { where: { id: req.params.id } }
       );
       console.log(updated,"updated")
-      // Check if task was updated
-      if (updated) {
-        const [updatedLead] = await Lead.update(
-          { status:status,
-            company:company,
-            city:city,
-            email:email,
-           }, 
-          { where: { id: leadId } }
-        );
+      // if (updated) {
+      //   const [updatedLead] = await Lead.update(
+      //     { status:status,
+      //       company:company,
+      //       city:city,
+      //       email:email,
+      //      }, 
+      //     { where: { id: leadId } }
+      //   );
 
-        const updatedTask = await Task.findByPk(req.params.id, {
-          include: [
-            { model: User, as: 'user', attributes: ['id'] },
-            { model: Lead, as: 'lead', attributes: ['id'] }
-          ]
-        });
+      //   const updatedTask = await Task.findByPk(req.params.id, {
+      //     include: [
+      //       { model: User, as: 'user', attributes: ['id'] },
+      //       { model: Lead, as: 'lead', attributes: ['id'] }
+      //     ]
+      //   });
   
-        res.status(200).json({ task: updatedTask, lead: updatedLead });
-      } else {
-        res.status(404).json({ message: 'Task not found' });
-      }
+      //   res.status(200).json({ task: updatedTask, lead: updatedLead });
+      // } else {
+      //   res.status(404).json({ message: 'Task not found' });
+      // }
     } catch (error) {
       console.error('Error updating task:', error);
       res.status(500).json({ error: error.message });

@@ -3,6 +3,7 @@ const { User, Lead, LeadAssignment } = db;
 
 exports.assignLeads = async (req, res) => {
     const { leadIds, assignedBy, assignedDate, assignedToUserId } = req.body;
+    console.log( req.body," req.body")
     try {
         const user = await User.findByPk(assignedToUserId);
         const adminOrManager = await User.findByPk(assignedBy);
@@ -27,10 +28,10 @@ exports.assignLeads = async (req, res) => {
             assignedByUserId:adminOrManager.id, 
             assignedDate: assignedDate ? new Date(assignedDate) : new Date()
         }));
-        await LeadAssignment.bulkCreate(assignments, {
+       let resp=  await LeadAssignment.bulkCreate(assignments, {
             updateOnDuplicate: ['userId', 'assignedBy', 'assignedDate'],
         });
-
+      console.log(resp,"resp")
         return res.status(200).json({ message: 'Leads successfully assigned.',assignedTo:user,assignedBy:adminOrManager });
     } catch (error) {
         console.error('Error assigning leads:', error);

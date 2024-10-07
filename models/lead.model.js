@@ -27,9 +27,9 @@ module.exports = (sequelize, Sequelize) => {
         email: {
           type: Sequelize.STRING,
           allowNull: true,
-          validate: {
-            isEmail: true,
-          },
+          // validate: {
+          //   isEmail: true,
+          // },
         },
         leadSource: {
           type: Sequelize.STRING,

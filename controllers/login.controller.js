@@ -32,6 +32,7 @@ exports.authenticate = async (req, res) => {
     const userData = {
       id: user.id,
       email:user.email,
+      name:user.name?user.name:null,
       role: user.role,
       department: user.department ? user.department : null,
     };

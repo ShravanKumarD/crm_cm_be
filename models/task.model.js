@@ -4,11 +4,13 @@ const { create } = require("express-handlebars");
 module.exports = (sequelize, Sequelize) => {
     const task = sequelize.define(
         "task",
-        {
-            // title:{
-            //         type: Sequelize.STRING,
-            //         allowNull: true
-            // },   
+        {   
+            id: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+                allowNull: false,
+              },
             description:{
                 type: Sequelize.STRING,
                 allowNull: true
