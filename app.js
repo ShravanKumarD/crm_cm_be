@@ -27,7 +27,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 // Middleware
 app.use(cors({ origin: "*" })); 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());

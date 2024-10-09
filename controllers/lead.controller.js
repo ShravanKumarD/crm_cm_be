@@ -93,8 +93,6 @@ exports.createBulkLeads = async (req, res) => {
   }
 };
 
-
-// Get all leads
 exports.getAllLeads = async (req, res) => {
   try {
     const leads = await Lead.findAll({
@@ -104,21 +102,25 @@ exports.getAllLeads = async (req, res) => {
           as: 'tasks',
           attributes: ['id', 'status', 'description', 'actionType', 'followUp', 'taskStatus'],
         },
+        {
+          model: db.LeadAssignment,
+          as: 'LeadAssignments',
+          attributes: ['leadId', 'assignedByUserId', 'assignedDate', 'assignedToUserId', 'scheduledLeadDate', 'status', 'note'],
+        },
       ],
     });
-    res.status(200).json({
-      leads,
-    });
+
+    return res.status(200).json({ leads });
   } catch (error) {
     console.error("Error fetching leads:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to fetch leads",
       error: error.message,
     });
   }
 };
 
-// Get a lead by ID
+
 exports.getLeadById = async (req, res) => {
   try {
     const { id } = req.params;
