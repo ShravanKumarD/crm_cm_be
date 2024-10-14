@@ -1,7 +1,6 @@
 const dbConfig = require("./../configs/db.config");
 const Sequelize = require("sequelize");
-console.log(dbConfig)
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, `Creditmitra#123456789`, {
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   // operatorsAliases: false,
@@ -36,6 +35,7 @@ db.LeadAssignment = require("./LeadAssignment.model")(sequelize, Sequelize);
 db.Task = require("./task.model")(sequelize, Sequelize);
 db.loansReport = require("./loansReport.modal")(sequelize,Sequelize);
 db.creditReport=require("./creditReport.modal")(sequelize,Sequelize);
+db.HomeLoansReport=require("./homeLoanReport")(sequelize,Sequelize);
 
 
 db.User.hasMany(db.Lead, { foreignKey: "userId" });
@@ -66,6 +66,11 @@ db.loansReport.belongsTo(db.Lead, {
   foreignKey: "leadId",
   as: "lead",
 });
+db.HomeLoansReport.belongsTo(db.Lead,{
+  foreignKey:"leadId",
+  as:"lead"
+})
+
 db.Lead.hasMany(db.creditReport, {
   foreignKey: "leadId",
   as: "creditReports", 

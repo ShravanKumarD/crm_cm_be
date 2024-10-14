@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-    const LoansReport = sequelize.define(
-        "LoansReport",
+    const HomeLoansReport = sequelize.define(
+        "HomeLoansReport",
         {
             leadId: {
                 type: Sequelize.INTEGER,
@@ -18,16 +18,12 @@ module.exports = (sequelize, Sequelize) => {
                 },
                 allowNull: false,
             },
-            loanType:{
-                type: Sequelize.STRING, 
-                allowNull:false,
-               },
             bankName: {
                 type: Sequelize.STRING(255),
                 allowNull: false,
             },
             loanAmount: {
-                type: Sequelize.DECIMAL(10, 2),
+                type: Sequelize.DECIMAL(14, 2),
                 allowNull: true,
             },
             emi: {
@@ -35,7 +31,7 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: true,
             },
             outstanding: {
-                type: Sequelize.DECIMAL(10, 2),
+                type: Sequelize.DECIMAL(12, 2),
                 allowNull: true,
             },
         },
@@ -46,5 +42,5 @@ module.exports = (sequelize, Sequelize) => {
         }
     );
 
-    return LoansReport;
+    return HomeLoansReport;
 };

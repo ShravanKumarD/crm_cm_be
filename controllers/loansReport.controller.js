@@ -1,11 +1,13 @@
 const db = require("./../models/index");
 const LoansReport = db.loansReport;
+const HomeLoansReport = db.HomeLoansReport;
 
-// Create a new LoansReport
-exports.create = async (req, res) => {
-    console.log(req.body,"req")
+
+exports.createPloanReport = async (req, res) => {
+    console.log(req.body,"req.bodu")
     try {
         const loanReport = await LoansReport.create({
+            loanType:req.body.loanType,
             bankName:req.body.bankName,
             loanAmount: req.body.loanAmount,
             emi: req.body.emi,
@@ -16,21 +18,29 @@ exports.create = async (req, res) => {
         console.log(loanReport,"loanReport")
         res.status(201).json({ message: "Loan report created successfully", loanReport });
     } catch (error) {
+        console.log(error,"error    ")
         res.status(500).json({ message: "Error creating loan report", error: error.message });
     }
 };
 
-// Retrieve all LoansReports
 exports.findAll = async (req, res) => {
+    const { leadId } = req.params;
+
+    if (!leadId) {
+        return res.status(400).json({ message: "leadId is required" });
+    }
+
     try {
-        const loanReports = await LoansReport.findAll();
+        const loanReports = await LoansReport.findAll({
+            where: { leadId }
+        });
         res.status(200).json(loanReports);
     } catch (error) {
         res.status(500).json({ message: "Error retrieving loan reports", error: error.message });
     }
 };
 
-// Retrieve a single LoansReport by id
+
 // exports.findOne = async (req, res) => {
 //     try {
 //         const loanReport = await LoansReport.findByPk(req.params.id);
@@ -75,9 +85,11 @@ exports.delete = async (req, res) => {
 exports.findByLeadId = async (req, res) => {
     try {
         const leadId = req.params.id;
+        console.log(leadId,req.params,"LEADID")
         const loanReports = await LoansReport.findAll({
             where: { leadId: leadId }
         });
+        console.log(loanReports,"loanReports")
         if (loanReports.length === 0) {
             return res.status(404).json({ message: "No loan reports found for the user" });
         }
@@ -86,3 +98,29 @@ exports.findByLeadId = async (req, res) => {
         res.status(500).json({ message: "Error retrieving loan reports by userId", error: error.message });
     }
 };
+
+exports.createHomeLoanReport =  async (req,res)=>{
+    try {
+        const homeLoanReport = await HomeLoansReport.create({
+            bankName:req.body.bankName,
+            loanAmount: req.body.loanAmount,
+            emi: req.body.emi,
+            outstanding: req.body.outstanding,
+            userId:req.body.userId ,
+            leadId: req.body.leadId
+        });
+        console.log(HomeLoansReport,"loanReport")
+        res.status(201).json({ message: "Home Loan report created successfully", HomeLoansReport });
+    } catch (error) {
+        res.status(500).json({ message: "Error creating loan report", error: error.message });
+    }
+}
+
+exports.getAllHomeReports = async (req,res)=>{
+    try {
+        const homeLoanReports = await HomeLoansReport.findAll();
+       res.status(200).json({homeLoanReports:homeLoanReports})
+    }catch(error){
+        res.status(500).json({error:error})
+    }
+}

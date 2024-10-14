@@ -15,7 +15,7 @@ const loginRoutes = require('./routes/login.routes');
 const taskRoutes = require('./routes/task.routes');
 const loansReportRoutes = require("./routes/loansReport.routes");
 const creditReportRoutes = require("./routes/creditReport.routes");
-
+const homeLoanReport = require("./routes/homeReports.route");
 require("dotenv").config();
 
 const app = express();
@@ -50,6 +50,7 @@ app.use('/auth',loginRoutes);
 app.use('/task',taskRoutes);
 app.use("/loans-reports", loansReportRoutes);
 app.use("/credit-reports", creditReportRoutes);
+app.use("/home-loans",homeLoanReport);
 
 // Catch 404 and forward to error handler
   // app.use((req, res, next) => {

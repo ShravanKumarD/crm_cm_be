@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const loansReportController = require("./../controllers/loansReport.controller");
 
-router.post("/", loansReportController.create);
+router.post("/", loansReportController.createPloanReport);
 router.get("/", loansReportController.findAll);
 // router.get("/:id", loansReportController.findOne);
 // router.put("/:id", loansReportController.update);

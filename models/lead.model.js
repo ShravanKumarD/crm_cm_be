@@ -77,6 +77,14 @@ module.exports = (sequelize, Sequelize) => {
           type: Sequelize.STRING,
           allowNull: true
       },
+      loginDate:{
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      closingDate:{
+        type: Sequelize.DATE,
+        allowNull: true
+      },
         userId: { 
             type: Sequelize.INTEGER,
             references: {
